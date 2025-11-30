@@ -73,6 +73,38 @@ Set environment variables via `.env` (see `.env.example`):
 - `DATABASE_URL` – defaults to `sqlite:///./data/app.db`.
 - `MAX_THEMES` – number of themes returned per analysis.
 - `LLM_PROVIDER` / `OPENAI_API_KEY` – stubbed out; ready for real LLM integration.
+- `CORS_ALLOWED_ORIGINS` – comma-separated list of allowed CORS origins (production).
+- `MAX_UPLOAD_SIZE` – maximum file upload size in bytes (default: 10MB).
+- `MAX_INGESTION_ROWS` – maximum rows processed per file for DoS protection (default: 50,000).
+- `LLM_RATE_LIMIT_RPM` – rate limit for LLM API calls in requests per minute (default: 60).
+
+## Security
+
+**Important**: This application includes security features, but additional measures are required for production use.
+
+See [SECURITY.md](SECURITY.md) for:
+- Security best practices and guidelines
+- Configuration recommendations
+- Production deployment checklist
+- Vulnerability reporting process
+
+### Key Security Features
+
+- ✅ File upload validation (type, size, content)
+- ✅ DoS protection (row limits, size limits)
+- ✅ Environment-based CORS configuration
+- ✅ Rate limiting for LLM API calls
+- ✅ API key validation
+- ✅ Input sanitization and validation
+- ✅ Connection pooling and database security settings
+
+### Dependency Security
+
+Regularly audit dependencies for vulnerabilities:
+
+```bash
+poetry audit  # Check for known vulnerabilities in dependencies
+```
 
 ## Tooling
 

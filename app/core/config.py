@@ -18,6 +18,12 @@ class Settings(BaseSettings):
     openai_api_key: str | None = None
     openai_model: str = "gpt-4o-mini"
 
+    # Security settings
+    cors_allowed_origins: str = ""
+    max_upload_size: int = 10485760  # 10MB default
+    max_ingestion_rows: int = 50000  # DoS protection
+    llm_rate_limit_rpm: int = 60  # Rate limit for LLM API calls
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
     @property

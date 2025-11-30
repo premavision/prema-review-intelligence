@@ -47,8 +47,9 @@ class IngestionService:
         "review_date": "created_at",
     }
 
-    def __init__(self, session: Session):
+    def __init__(self, session: Session, max_rows: int | None = None):
         self.session = session
+        self.max_rows = max_rows
 
     def ingest_file(self, dataset: Dataset, payload: bytes, filename: str) -> IngestionResult:
         if not payload:
@@ -62,9 +63,20 @@ class IngestionService:
         else:
             raise ValueError(f"Unsupported file type: {extension}")
 
+        # DoS protection: limit number of rows processed
+        if self.max_rows and len(dataframe) > self.max_rows:
+            dataframe = dataframe.head(self.max_rows)
+            warning_msg = f"File contains more than {self.max_rows} rows. Only first {self.max_rows} rows will be processed."
+        else:
+            warning_msg = None
+
         normalized_df = self._normalize_columns(dataframe)
         review_models: list[Review] = []
         warnings: list[str] = []
+        
+        if warning_msg:
+            warnings.append(warning_msg)
+        
         for row in normalized_df.to_dict(orient="records"):
             parsed = self._row_to_review(dataset_id=dataset.id, row=row)
             if not parsed:
@@ -83,17 +95,50 @@ class IngestionService:
         return IngestionResult(imported=len(review_models), warnings=warnings)
 
     def _load_json(self, payload: bytes) -> pd.DataFrame:
-        text = payload.decode("utf-8")
+        try:
+            text = payload.decode("utf-8")
+        except UnicodeDecodeError as e:
+            raise ValueError(f"Invalid file encoding: {e}") from e
+        
         lines = [line for line in text.strip().splitlines() if line]
+        
+        # Limit JSON parsing to prevent DoS attacks
+        max_json_lines = (self.max_rows or 100000) * 2  # Safety multiplier
+        if len(lines) > max_json_lines:
+            lines = lines[:max_json_lines]
+        
         if len(lines) == 1:
-            data = json.loads(lines[0])
+            try:
+                data = json.loads(lines[0])
+            except json.JSONDecodeError as e:
+                raise ValueError(f"Invalid JSON format: {e}") from e
+            
             if isinstance(data, dict):
                 if "reviews" in data:
                     data = data["reviews"]
+                    if not isinstance(data, list):
+                        raise ValueError("Expected 'reviews' to be a list")
                 else:
                     data = [data]
+            elif isinstance(data, list):
+                pass  # Already a list
+            else:
+                raise ValueError(f"Unexpected JSON structure: expected dict or list, got {type(data)}")
         else:
-            data = [json.loads(line) for line in lines]
+            # NDJSON format - parse line by line with error handling
+            data = []
+            for idx, line in enumerate(lines):
+                try:
+                    parsed = json.loads(line)
+                    if isinstance(parsed, dict):
+                        data.append(parsed)
+                except json.JSONDecodeError as e:
+                    # Skip invalid lines rather than failing completely
+                    continue
+        
+        if not data:
+            raise ValueError("No valid JSON data found in file")
+        
         return pd.DataFrame(data)
 
     def _normalize_columns(self, df: pd.DataFrame) -> pd.DataFrame:
