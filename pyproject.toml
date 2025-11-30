@@ -1,0 +1,62 @@
+[tool.poetry]
+name = "prema-review-intelligence"
+version = "0.1.0"
+description = "E-commerce review intelligence prototype for Prema Vision"
+authors = ["Denys Korolkov <denys@premavision.ai>"]
+readme = "README.md"
+packages = [{ include = "app" }, { include = "dashboard" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.115.0"
+uvicorn = { extras = ["standard"], version = "^0.32.0" }
+sqlmodel = "^0.0.22"
+pydantic-settings = "^2.6.0"
+pandas = "^2.2.3"
+python-multipart = "^0.0.9"
+streamlit = "^1.40.0"
+httpx = "^0.27.2"
+numpy = "^2.1.3"
+scikit-learn = "^1.5.2"
+text-unidecode = "^1.3"
+python-dateutil = "^2.9.0.post0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+pytest-asyncio = "^0.23.8"
+black = "^24.10.0"
+ruff = "^0.7.3"
+isort = "^5.13.2"
+mypy = "^1.11.2"
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+exclude = "(\.venv|build|dist|data/processed)"
+
+[tool.isort]
+profile = "black"
+line_length = 100
+known_first_party = ["app", "dashboard"]
+
+[tool.ruff]
+line-length = 100
+src = ["app", "dashboard", "scripts", "tests"]
+select = [
+    "E4",
+    "E7",
+    "E9",
+    "F",
+    "B",
+    "I",
+    "N",
+]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[build-system]
+requires = ["poetry-core>=1.9.0"]
+build-backend = "poetry.core.masonry.api"
