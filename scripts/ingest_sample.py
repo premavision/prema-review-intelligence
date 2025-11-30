@@ -25,20 +25,20 @@ def main(path: str) -> None:
     with Session(engine) as session:
         dataset_service = DatasetService(session=session, analysis_service=analysis_service)
         dataset = dataset_service.create_dataset(
-            DatasetCreate(name=file_path.stem.replace(\"_\", \" \").title(), source=\"import\")
+            DatasetCreate(name=file_path.stem.replace("_", " ").title(), source="import")
         )
         payload = file_path.read_bytes()
         dataset_service.ingest_reviews(dataset_id=dataset.id, file_payload=payload, filename=file_path.name)
-        print(f\"Ingested sample dataset '{dataset.name}' ({dataset.total_reviews} reviews)\")
+        print(f"Ingested sample dataset '{dataset.name}' ({dataset.total_reviews} reviews)")
 
 
-if __name__ == \"__main__\":
-    parser = argparse.ArgumentParser(description=\"Ingest sample review data into SQLite\")
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Ingest sample review data into SQLite")
     parser.add_argument(
-        \"path\",
-        nargs=\"?\",
-        default=\"data/samples/sample_reviews.csv\",
-        help=\"Path to CSV or JSON file containing reviews\",
+        "path",
+        nargs="?",
+        default="data/samples/sample_reviews.csv",
+        help="Path to CSV or JSON file containing reviews",
     )
     args = parser.parse_args()
     main(args.path)

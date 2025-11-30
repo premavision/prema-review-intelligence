@@ -32,7 +32,7 @@ mypy = "^1.11.2"
 [tool.black]
 line-length = 100
 target-version = ["py311"]
-exclude = "(\.venv|build|dist|data/processed)"
+exclude = "(\\.venv|build|dist|data/processed)"
 
 [tool.isort]
 profile = "black"
