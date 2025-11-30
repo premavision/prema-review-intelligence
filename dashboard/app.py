@@ -86,10 +86,15 @@ def upload_section() -> None:
     name = st.sidebar.text_input("Dataset name", placeholder="Fall launch set")
     file = st.sidebar.file_uploader("CSV or JSON", type=["csv", "json"])
     if st.sidebar.button("Upload") and file and name:
-        with st.spinner("Uploading dataset..."):
-            upload_dataset(name, file)
-            fetch_datasets.clear()
-        st.sidebar.success("Dataset uploaded")
+        try:
+            with st.spinner("Uploading dataset..."):
+                result = upload_dataset(name, file)
+                fetch_datasets.clear()
+                st.sidebar.success(f"Dataset uploaded! {result.get('imported_reviews', 0)} reviews imported.")
+        except httpx.HTTPStatusError as e:
+            st.sidebar.error(f"Upload failed: {e.response.status_code} - {e.response.text}")
+        except Exception as e:
+            st.sidebar.error(f"Upload failed: {str(e)}")
 
 
 def main() -> None:
