@@ -1,0 +1,9 @@
+product_id,product_name,platform,rating,title,body,created_at
+SKU-1000,Orbit Smartwatch,amazon,5,Love the battery,"Battery lasts me three days even with GPS on.",2024-09-01
+SKU-1000,Orbit Smartwatch,amazon,2,Charger broke,"Wish the charger cable was sturdier. Broke after a month.",2024-09-05
+SKU-1000,Orbit Smartwatch,shopify,4,Sleek design,"Looks amazing and fits under shirt cuffs.",2024-09-10
+SKU-2000,Aero Buds,amazon,1,Uncomfortable,"These hurt after 20 minutes. Need softer tips.",2024-08-20
+SKU-2000,Aero Buds,amazon,5,Great sound,"Bass is punchy and calls are crystal clear.",2024-08-22
+SKU-2000,Aero Buds,shopify,3,Battery meh,"Battery life could be longer; lasts about 3 hours.",2024-08-25
+SKU-3000,Comfy Sneakers,amazon,4,So comfy,"Feels like walking on clouds. Would love more colors.",2024-07-15
+SKU-3000,Comfy Sneakers,amazon,2,Sizing off,"Runs small and returns process was clunky.",2024-07-20
