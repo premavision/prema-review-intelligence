@@ -1,121 +1,155 @@
-# Prema Review Intelligence
+# 🧠 Prema Review Intelligence  
+### AI-powered E-commerce Review Analysis · FastAPI + Streamlit + SQLite
 
-E-commerce review intelligence prototype for the Prema Vision portfolio. The app ingests raw review exports (CSV/JSON), stores them in SQLite, analyzes sentiment & themes, exposes a FastAPI backend, and offers a Streamlit dashboard for stakeholders.
+Prema Review Intelligence is a lightweight but production-ready prototype for **automated analysis of large e-commerce review datasets**.  
+It ingests raw CSV/JSON exports, stores them in SQLite, computes sentiment & thematic insights, exposes a **FastAPI backend**, and ships with a **Streamlit dashboard** for interactive exploration.
 
-## Highlights
+This project is part of the **Prema Vision AI Automations** portfolio.
 
-- Review ingestion with dataset management and provenance metadata.
-- Lightweight NLP pipeline mixing classical heuristics with an LLM-ready abstraction.
-- Caching of dataset analyses to avoid re-running heavy steps.
-- FastAPI-powered API plus Streamlit dashboard for quick exploration.
-- Sample data and scripts to demo the workflow end to end.
+---
 
-## Project Layout
+## 🔍 What It Does
+
+- 📥 **Ingest raw review files** (CSV/JSON) with dataset metadata  
+- 🧹 **Validate files** (size, type, row limits) for safe ingestion  
+- 💾 **Store reviews in SQLite** using SQLModel  
+- 🧠 **Analyze sentiment, themes, and summary statistics**  
+- ⚡ **Cache heavy analyses** to avoid recomputation  
+- 🔌 **Expose a clean API** with FastAPI  
+- 📊 **Interactive dashboard** built with Streamlit  
+- 🧪 **Testable architecture** with sample data and simple unit tests  
+
+---
+
+## 🏗 Architecture Overview
 
 ```
 app/
-  analysis/        # stats + theme extraction + LLM wrapper
-  api/             # FastAPI routers & dependencies
-  core/            # settings + logging
-  db/              # SQLModel models & engine helpers
-  ingestion/       # CSV/JSON ingestion service
-  schemas/         # Pydantic DTOs shared across layers
-  services/        # Orchestration services (dataset, analysis)
-dashboard/         # Streamlit UI that calls the API
+  analysis/        # Stats + theme extraction + LLM abstraction
+  api/             # FastAPI routes, dependencies, middleware
+  core/            # Settings, logging, environment config
+  db/              # SQLModel models and DB engine
+  ingestion/       # CSV/JSON ingestion pipeline
+  schemas/         # Pydantic DTOs for API transport
+  services/        # Orchestrators for datasets & analyses
+
+dashboard/
+  app.py           # Streamlit UI powered by the API
+
 data/samples/      # Example datasets for demos
-scripts/           # Utility scripts (e.g., ingest sample)
+scripts/           # Helper scripts (e.g., ingest sample data)
 tests/             # Lightweight unit tests
 ```
 
-## Getting Started
+---
 
-1. **Install dependencies**
+## 🚀 Getting Started
 
-   ```bash
-   poetry install
-   ```
-
-2. **Seed the database with sample data**
-
-   ```bash
-   poetry run python scripts/ingest_sample.py
-   ```
-
-3. **Run the API**
-
-   ```bash
-   poetry run uvicorn app.main:app --reload
-   ```
-
-4. **Run the Streamlit dashboard (optional)**
-
-   ```bash
-   poetry run streamlit run dashboard/app.py
-   ```
-
-   By default the dashboard expects the API at `http://localhost:8000`. Override with `REVIEW_API_BASE_URL`.
-
-## API Overview
-
-- `GET /health` – health check.
-- `POST /datasets` – multipart upload of CSV/JSON to create a dataset and ingest reviews.
-- `GET /datasets` – list datasets with metadata.
-- `GET /datasets/{id}/summary?force={bool}` – cached stats + summary + top themes.
-- `GET /datasets/{id}/themes` – theme list with sentiments & representative reviews.
-- `GET /reviews` – filterable review list (dataset/min/max rating).
-
-Use the generated OpenAPI docs at `http://localhost:8000/docs`.
-
-## Configuration
-
-Set environment variables via `.env` (see `.env.example`):
-
-- `DATABASE_URL` – defaults to `sqlite:///./data/app.db`.
-- `MAX_THEMES` – number of themes returned per analysis.
-- `LLM_PROVIDER` / `OPENAI_API_KEY` – stubbed out; ready for real LLM integration.
-- `CORS_ALLOWED_ORIGINS` – comma-separated list of allowed CORS origins (production).
-- `MAX_UPLOAD_SIZE` – maximum file upload size in bytes (default: 10MB).
-- `MAX_INGESTION_ROWS` – maximum rows processed per file for DoS protection (default: 50,000).
-- `LLM_RATE_LIMIT_RPM` – rate limit for LLM API calls in requests per minute (default: 60).
-
-## Security
-
-**Important**: This application includes security features, but additional measures are required for production use.
-
-See [SECURITY.md](SECURITY.md) for:
-- Security best practices and guidelines
-- Configuration recommendations
-- Production deployment checklist
-- Vulnerability reporting process
-
-### Key Security Features
-
-- ✅ File upload validation (type, size, content)
-- ✅ DoS protection (row limits, size limits)
-- ✅ Environment-based CORS configuration
-- ✅ Rate limiting for LLM API calls
-- ✅ API key validation
-- ✅ Input sanitization and validation
-- ✅ Connection pooling and database security settings
-
-### Dependency Security
-
-Regularly audit dependencies for vulnerabilities:
+### 1. Install dependencies
 
 ```bash
-poetry audit  # Check for known vulnerabilities in dependencies
+poetry install
 ```
 
-## Tooling
+### 2. Seed the database with sample data
 
-- Format: `poetry run black .` + `poetry run isort .`
-- Lint: `poetry run ruff check .`
-- Tests: `poetry run pytest`
+```bash
+poetry run python scripts/ingest_sample.py
+```
 
-## Next Steps
+### 3. Run the API
 
-- Swap `MockLLMClient` with a production LLM provider.
-- Add richer clustering/embedding analysis.
-- Wire ingestion to live sources (Amazon, Shopify, etc.).
+```bash
+poetry run uvicorn app.main:app --reload
+```
 
-Contributions welcome – open an issue or reach out to Prema Vision.
+### 4. (Optional) Run the Streamlit dashboard
+
+```bash
+poetry run streamlit run dashboard/app.py
+```
+
+Default dashboard API target:  
+`http://localhost:8000`  
+Override via: `REVIEW_API_BASE_URL`
+
+---
+
+## 🔌 API Overview
+
+### Health
+- `GET /health`
+
+### Datasets
+- `POST /datasets` — upload CSV/JSON and ingest  
+- `GET /datasets` — list datasets  
+- `GET /datasets/{id}/summary?force={bool}` — stats, sentiment, themes  
+- `GET /datasets/{id}/themes` — structured theme extraction
+
+### Reviews
+- `GET /reviews` — filterable review list  
+  - params: dataset, rating range, paging
+
+Interactive docs:  
+**http://localhost:8000/docs**
+
+---
+
+## 🔐 Security Features
+
+This project includes a practical security foundation:
+
+- ✅ File type/size/content validation  
+- ✅ DoS protection via row & size limits  
+- ✅ CORS configuration via environment  
+- ✅ Rate limiting for LLM calls  
+- ✅ API key validation  
+- ✅ Input sanitization (Pydantic)  
+- ✅ Controlled DB access via SQLModel & engine pooling  
+
+For full guidance and deployment notes, see:  
+**`SECURITY.md`**
+
+---
+
+## ⚙️ Configuration
+
+Defined via `.env` (see `.env.example`):
+
+- `DATABASE_URL` — default `sqlite:///./data/app.db`
+- `MAX_THEMES` — number of returned themes
+- `LLM_PROVIDER` / `OPENAI_API_KEY` — optional LLM integration
+- `CORS_ALLOWED_ORIGINS`
+- `MAX_UPLOAD_SIZE` — default 10MB
+- `MAX_INGESTION_ROWS` — DoS protection (default: 50,000)
+- `LLM_RATE_LIMIT_RPM` — default: 60
+
+---
+
+## 🧪 Development Tooling
+
+```bash
+poetry run black .
+poetry run isort .
+poetry run ruff check .
+poetry run pytest
+```
+
+---
+
+## 🛣 Next Steps (Roadmap)
+
+- Swap `MockLLMClient` for OpenAI/Anthropic  
+- Improve clustering & embeddings  
+- Add product-level insights (pricing, defect themes)  
+- Connect ingestion to live sources (Amazon, Shopify)  
+- Add multi-dataset comparison & trend analysis
+
+---
+
+## 🤝 Contributing
+
+Issues and PRs welcome.  
+Part of the **Prema Vision** internal AI automation suite.
+
+MIT License.
