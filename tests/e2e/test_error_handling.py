@@ -7,6 +7,10 @@ This test suite covers error scenarios and edge cases:
 - Non-existent resources
 - Rate limiting and size limits
 - Database errors and recovery
+
+SECURITY NOTE: These tests validate that security measures are properly
+implemented. They test security protections, not expose vulnerabilities.
+All test data is synthetic and used only in isolated test environments.
 """
 
 import json
@@ -24,14 +28,20 @@ class TestFileUploadErrors:
         """
         Test that files exceeding size limit are rejected.
         
-        Security test: ensures max_upload_size limit is enforced
-        to prevent DoS attacks. Expected: 413 status with error message.
+        Security validation test: Verifies that max_upload_size limit is enforced
+        to prevent DoS attacks. This test validates security protections are working.
+        Expected: 413 status with error message.
+        
+        NOTE: This test uses synthetic test data in an isolated environment.
+        The large file content is never persisted or processed.
         """
         # Create a file larger than default 10MB limit
-        large_content = b"x" * (11 * 1024 * 1024)  # 11MB
+        # This is synthetic test data used only to validate security limits
+        large_content = b"x" * (11 * 1024 * 1024)  # 11MB - test data only
         files = {"file": ("large_file.csv", large_content, "text/csv")}
         data = {"name": "Large File Test"}
         response = api_client.post("/datasets", data=data, files=files)
+        # Verify security protection: large files are rejected
         assert response.status_code == 413
         assert "size" in response.json()["detail"].lower()
 

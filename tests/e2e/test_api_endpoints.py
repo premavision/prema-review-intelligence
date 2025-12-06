@@ -7,6 +7,11 @@ This test suite covers all API endpoints with comprehensive scenarios:
 - Review listing and filtering
 - Theme extraction
 - Error handling and validation
+
+SECURITY NOTE: Security-related tests in this file validate that security
+measures are properly implemented. They test security protections (file type
+validation, size limits, etc.), not expose vulnerabilities. All test data
+is synthetic and used only in isolated test environments.
 """
 
 import json
@@ -187,13 +192,20 @@ class TestDatasetEndpoints:
         """
         Test that invalid file types are rejected.
         
-        Security test: ensures only allowed file types (CSV, JSON) are accepted.
+        Security validation test: Verifies that only allowed file types (CSV, JSON)
+        are accepted. This test validates security protections are working.
         Expected: 400 error with descriptive message.
+        
+        NOTE: This test uses synthetic HTML content as test data in an isolated
+        environment. The content is never processed or persisted - it's only
+        used to verify the security validation rejects it.
         """
+        # Synthetic test data - HTML content used only to test file type validation
         invalid_file = b"<html><body>Not a review file</body></html>"
         files = {"file": ("invalid.html", invalid_file, "text/html")}
         data = {"name": "Invalid File Test"}
         response = api_client.post("/datasets", data=data, files=files)
+        # Verify security protection: invalid file types are rejected
         assert response.status_code == 400
         assert "not allowed" in response.json()["detail"].lower()
 

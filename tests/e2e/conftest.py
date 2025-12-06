@@ -7,6 +7,10 @@ This module provides:
 - API client fixtures
 - Browser fixtures for Playwright
 - Test data helpers
+
+SECURITY NOTE: All test data is synthetic and used only in isolated test
+environments. Test databases are temporary and cleaned up after tests.
+No production data or real user data is used in these tests.
 """
 
 import os
