@@ -179,3 +179,8 @@ If you discover a security vulnerability, please report it responsibly:
 3. Provide detailed information about the vulnerability.
 4. Allow time for the issue to be addressed before public disclosure.
 
+
+
+
+
+

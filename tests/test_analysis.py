@@ -22,4 +22,3 @@ def test_extract_themes_returns_top_terms() -> None:
     themes = extract_themes(reviews, max_themes=2)
     assert themes
     assert any("Battery" in theme.name for theme in themes)
-

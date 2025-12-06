@@ -10,7 +10,7 @@ router = APIRouter(prefix="/datasets/{dataset_id}/themes", tags=["themes"])
 @router.get("", response_model=list[Theme])
 def list_themes(
     dataset_id: int,
-    dataset_service: DatasetService = Depends(get_dataset_service),
+    dataset_service: DatasetService = Depends(get_dataset_service),  # noqa: B008
 ) -> list[Theme]:
     analysis = dataset_service.get_dataset_analysis(dataset_id, force_refresh=False)
     if not analysis:
@@ -19,4 +19,3 @@ def list_themes(
             detail="No analysis available for dataset",
         )
     return analysis.themes
-

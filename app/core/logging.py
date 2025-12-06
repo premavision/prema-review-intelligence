@@ -8,4 +8,3 @@ def configure_logging() -> None:
         level=settings.log_level,
         format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
     )
-
