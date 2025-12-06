@@ -17,4 +17,3 @@ def excerpt(text: str, max_length: int = 220) -> str:
         return normalized
     snippet = normalized[: max_length - 3].rsplit(" ", 1)[0]
     return f"{snippet}..."
-
