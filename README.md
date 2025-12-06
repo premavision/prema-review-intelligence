@@ -135,6 +135,25 @@ poetry run ruff check .
 poetry run pytest
 ```
 
+### End-to-End Testing
+
+Comprehensive e2e tests using Playwright are available in `tests/e2e/`:
+
+```bash
+# Install Playwright browsers (first time only)
+poetry run playwright install chromium
+
+# Run all e2e tests
+poetry run pytest tests/e2e/ -v
+
+# Run specific test categories
+poetry run pytest tests/e2e/test_api_endpoints.py -v    # API tests
+poetry run pytest tests/e2e/test_dashboard_ui.py -v    # UI tests
+poetry run pytest tests/e2e/test_error_handling.py -v  # Error handling
+```
+
+See `tests/e2e/README.md` for detailed documentation.
+
 ---
 
 ## 🛣 Next Steps (Roadmap)
