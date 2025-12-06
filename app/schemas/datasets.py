@@ -33,4 +33,3 @@ class DatasetIngestionResponse(BaseModel):
     imported_reviews: int
     warnings: list[str] = []
     extra: dict[str, Any] = {}
-

@@ -22,4 +22,3 @@ class ReviewCreate(ReviewBase):
 
 class ReviewRead(ReviewBase):
     id: int
-
