@@ -67,12 +67,13 @@ def api_server(test_database: str) -> Generator[str, None, None]:
     db_path.parent.mkdir(parents=True, exist_ok=True)
     
     # Start server in background
+    # Use DEVNULL to avoid deadlock from unread pipe buffer
+    # Server logs aren't needed for tests - errors are caught via health checks
     process = subprocess.Popen(
         ["poetry", "run", "uvicorn", "app.main:app", "--host", "127.0.0.1", "--port", "8000"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,  # Combine stderr with stdout
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
         env=os.environ.copy(),
-        text=True,
     )
     
     # Wait for server to be ready
@@ -90,22 +91,13 @@ def api_server(test_database: str) -> Generator[str, None, None]:
         
         # Check if process has died
         if process.poll() is not None:
-            # Process has terminated, get output
-            stdout, _ = process.communicate()
+            # Process has terminated
             error_msg = f"API server process exited with code {process.returncode}"
-            if stdout:
-                error_msg += f"\nServer output:\n{stdout}"
             raise RuntimeError(error_msg)
     
     if not server_ready:
         process.terminate()
-        try:
-            stdout, _ = process.communicate(timeout=2)
-            error_msg = "API server failed to start within timeout"
-            if stdout:
-                error_msg += f"\nServer output:\n{stdout}"
-        except Exception:
-            error_msg = "API server failed to start within timeout"
+        error_msg = "API server failed to start within timeout"
         raise RuntimeError(error_msg)
     
     yield API_BASE_URL
@@ -139,12 +131,13 @@ def dashboard_server(api_server: str) -> Generator[str, None, None]:
     os.environ["REVIEW_API_BASE_URL"] = API_BASE_URL
     
     # Start Streamlit in background
+    # Use DEVNULL to avoid deadlock from unread pipe buffer
+    # Dashboard logs aren't needed for tests - errors are caught via health checks
     process = subprocess.Popen(
         ["poetry", "run", "streamlit", "run", "dashboard/app.py", "--server.port", "8501", "--server.headless", "true"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,  # Combine stderr with stdout
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
         env=os.environ.copy(),
-        text=True,
     )
     
     # Wait for dashboard to be ready
@@ -162,22 +155,13 @@ def dashboard_server(api_server: str) -> Generator[str, None, None]:
         
         # Check if process has died
         if process.poll() is not None:
-            # Process has terminated, get output
-            stdout, _ = process.communicate()
+            # Process has terminated
             error_msg = f"Dashboard server process exited with code {process.returncode}"
-            if stdout:
-                error_msg += f"\nServer output:\n{stdout}"
             raise RuntimeError(error_msg)
     
     if not dashboard_ready:
         process.terminate()
-        try:
-            stdout, _ = process.communicate(timeout=2)
-            error_msg = "Dashboard server failed to start within timeout"
-            if stdout:
-                error_msg += f"\nServer output:\n{stdout}"
-        except Exception:
-            error_msg = "Dashboard server failed to start within timeout"
+        error_msg = "Dashboard server failed to start within timeout"
         raise RuntimeError(error_msg)
     
     yield DASHBOARD_URL
